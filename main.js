@@ -5,7 +5,7 @@ const generation = 0;
 const population = 0;
 const width = canvas.width;
 const height = canvas.height;
-let res = 50;
+let res = 10;
 let cellsArray = [];
 let isDragging = false;
 let dragStarted = false;
@@ -16,7 +16,7 @@ function setup() {
     context.fillRect(0,0,width,height);
     context.strokeStyle='white';
     context.lineWidth=1;
-    startButton.addEventListener('click', startGame);
+    startButton.addEventListener('click', ()=>setInterval(startGame,10));
 
     makeGrid();
     mouseControls();
@@ -56,7 +56,6 @@ function mouseControls() {
             const clickY = event.clientY - rect.top;
             let affectedCell = cellsArray[Math.floor(clickX/res)][Math.floor(clickY/res)];
             affectedCell.born();
-            //affectedCell.countNeighbours();
         }
     });
 
@@ -76,7 +75,6 @@ function mouseControls() {
             let affectedCell = cellsArray[Math.floor(clickX/res)][Math.floor(clickY/res)];
             if(affectedCell.isAlive) {affectedCell.kill()}
             else{affectedCell.born()};
-            affectedCell.countNeighbours();
         }
     })
 }
@@ -118,44 +116,34 @@ class Cell {
     }
 
     countNeighbours() {
-        let num = 0;
-        let opsArray = [this.row, this.col, this.row-1, this.col-1, this.row+1, this.col+1];
-        let edgeCount = (cellsArray[this.row+1]!== undefined) + (cellsArray[this.row-1]!== undefined) + (cellsArray[this.col+1]!== undefined) + (cellsArray[this.col-1]!== undefined);
+        this.neighbours = 0;
+        //checks all 8 neighbours and updates alive neighbours count
+        try {
+            if(cellsArray[this.row-1][this.col-1].isAlive){this.neighbours++};                
+        } catch(error) {}
+        try {
+            if(cellsArray[this.row-1][this.col  ].isAlive){this.neighbours++};              
+        } catch(error) {}
+        try {
+            if(cellsArray[this.row-1][this.col+1].isAlive){this.neighbours++};                
+        } catch(error) {}
+        try {
+            if(cellsArray[this.row  ][this.col-1].isAlive){this.neighbours++};                
+        } catch(error) {}
+        try {
+            if(cellsArray[this.row  ][this.col+1].isAlive){this.neighbours++};                
+        } catch(error) {}
+        try {
+            if(cellsArray[this.row+1][this.col-1].isAlive){this.neighbours++};                
+        } catch(error) {}
+        try {
+            if(cellsArray[this.row+1][this.col  ].isAlive){this.neighbours++};                
+        } catch(error) {}
+        try {
+            if(cellsArray[this.row+1][this.col+1].isAlive){this.neighbours++};                
+        } catch(error) {} 
 
-        if(edgeCount == 4) {    // normal cell
-            console.log('normal');
-        } else if( edgeCount == 3) { // edge cell
-            if(cellsArray[this.row+1]=== undefined){ //bottom edge missing
-                num = (cellsArray[opsArray[2]][opsArray[3]].isAlive
-                    +cellsArray[opsArray[2]][opsArray[1]].isAlive
-                    +cellsArray[opsArray[2]][opsArray[5]].isAlive
-                    +cellsArray[opsArray[0]][opsArray[3]].isAlive
-                    +cellsArray[opsArray[0]][opsArray[1]].isAlive)
-            } else if(cellsArray[this.row-1] === undefined) { // top edge missing
-                num = (cellsArray[opsArray[0]][opsArray[3]].isAlive
-                    +cellsArray[opsArray[0]][opsArray[5]].isAlive
-                    +cellsArray[opsArray[4]][opsArray[3]].isAlive
-                    +cellsArray[opsArray[4]][opsArray[1]].isAlive
-                    +cellsArray[opsArray[4]][opsArray[5]].isAlive)
-            } else if(cellsArray[this.col
-                +1] === undefined) { // right edge missing
-                num = (cellsArray[opsArray[2]][opsArray[3]].isAlive
-                    +cellsArray[opsArray[2]][opsArray[1]].isAlive
-                    +cellsArray[opsArray[0]][opsArray[3]].isAlive
-                    +cellsArray[opsArray[4]][opsArray[3]].isAlive
-                    +cellsArray[opsArray[4]][opsArray[1]].isAlive)
-            } else {    // left edge missing
-                num = (cellsArray[opsArray[2]][opsArray[1]].isAlive
-                    +cellsArray[opsArray[2]][opsArray[5]].isAlive
-                    +cellsArray[opsArray[0]][opsArray[5]].isAlive
-                    +cellsArray[opsArray[4]][opsArray[1]].isAlive
-                    +cellsArray[opsArray[4]][opsArray[5]].isAlive)
-            }
-
-            console.log(num);
-        } else { // corner cell
-            console.log('corner');
-        }
+        return this.neighbours;
     }
 
     kill() {
@@ -174,11 +162,28 @@ class Cell {
 
 //calculate neighbours and updates to next generation
 function startGame() {
+
     for(let row=0; row<cellsArray.length; row++) {
         for(let col=0; col<cellsArray[row].length; col++) {
-            cellsArray[row][col].countNeighbours();
+            let cell = cellsArray[row][col];
+            cell.countNeighbours();
+            if(cell.isAlive) {
+                if(cell.neighbours < 2) {
+                    cell.kill();
+                } else if(cell.neighbours == 2 || cell.neighbours == 3) {
+                    cell.born();
+                } else if(cell.neighbours >3) {
+                    cell.kill();
+                }
+            } else {
+                if(cell.neighbours == 3) {
+                    cell.born();
+                }
+            }
         }
     }
 }
 
 setup();
+
+            
