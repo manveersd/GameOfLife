@@ -14,6 +14,7 @@ let dragStarted = false;
 
 function setup() {
     createInitialArray();
+    mouseControls();
     draw(currentArr);
     textArea.textContent = `Generation: ${generation}`;
     startButton.addEventListener('click', drawAndUpdate);    
@@ -46,7 +47,7 @@ function mouseControls() {
             const clickY = event.clientY - rect.top;
             let affectedCell = currentArr[Math.floor(clickX / res)][Math.floor(clickY / res)];
             affectedCell.isAlive = true;
-            draw(currentArr);
+            ctx.fillRect(affectedCell.x, affectedCell.y, res, res);
         }
     });
 
@@ -63,10 +64,10 @@ function mouseControls() {
             const rect = canvas.getBoundingClientRect();
             const clickX = event.clientX - rect.left;
             const clickY = event.clientY - rect.top;
-            let affectedCell = cellsArray[Math.floor(clickX / res)][Math.floor(clickY / res)];
+            let affectedCell = currentArr[Math.floor(clickX / res)][Math.floor(clickY / res)];
             if (affectedCell.isAlive) { affectedCell.isAlive = false }
             else { affectedCell.isAlive = true};
-            draw(currentArr);
+            ctx.fillRect(affectedCell.x, affectedCell.y, res, res);
         }
     })
 }
@@ -114,12 +115,12 @@ function update(arr) {
             let count = countNeighbors(cell);
             //conditions
             let newCell = {x:cell.x, y:cell.y, isAlive:cell.isAlive};
-            if(count<2){
-                newCell.isAlive = false;
-            } else if(count == 2 || count == 3) {
-                newCell.isAlive = true;
-            } else if(count > 3) {
-                newCell.isAlive = false;
+            if (cell.isAlive) {
+                // A live cell with 2 or 3 neighbors stays alive, otherwise it dies
+                newCell.isAlive = (count === 2 || count === 3);
+            } else {
+                // A dead cell with exactly 3 neighbors becomes alive
+                newCell.isAlive = (count === 3);
             }
             newArr[col][row] = newCell;
         }
@@ -148,7 +149,7 @@ function drawAndUpdate() {
     generation++;
     let nextArr = update(currentArr);
     [currentArr, nextArr] = [nextArr, currentArr]; // Swap arrays
-    intervalId = setInterval(drawAndUpdate, 500);
+    intervalId = setInterval(drawAndUpdate, 50);
 }
 
 setup();
