@@ -90,7 +90,6 @@ function draw(arr) {
         for(let row = 0; row<arr[col].length; row++) {
             let cell = arr[col][row];
             ctx.beginPath();
-            ctx.fillStyle = "black";
             ctx.rect(cell.x, cell.y, res, res);
             if(cell.isAlive){ctx.fill()}else{ctx.stroke()}
         }       
