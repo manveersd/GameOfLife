@@ -30,9 +30,33 @@ function countNeighbors(cell) {
     let count  = 0;
     row = cell.x/res;
     col = cell.y/res;
-    try{
-        if()
-    } catch(e){};
+    try {
+        if (currentArr[row - 1][col - 1].isAlive) { count++ };
+    } catch (error) { }
+    try {
+        if (currentArr[row - 1][col    ].isAlive) { count++ };
+    } catch (error) { }
+    try {
+        if (currentArr[row - 1][col + 1].isAlive) { count++ };
+    } catch (error) { }
+    try {
+        if (currentArr[row    ][col - 1].isAlive) { count++ };
+    } catch (error) { }
+    try {
+        if (currentArr[row    ][col + 1].isAlive) { count++ };
+    } catch (error) { }
+    try {
+        if (currentArr[row + 1][col - 1].isAlive) { count++ };
+    } catch (error) { }
+    try {
+        if (currentArr[row + 1][col    ].isAlive) { count++ };
+    } catch (error) { }
+    try {
+        if (currentArr[row + 1][col + 1].isAlive) { count++ };
+    } catch (error) { }
+
+    console.log(count);
+    return count;
 }
 
 //updates whatever array is given to it and returns new array based on some rules
@@ -45,10 +69,8 @@ function update(arr) {
             let cell = (oldArr[col][row]);
             let count = countNeighbors(cell);
             //conditions
-            if(count == 1) {
-                newArr[col][row] = {x:cell.x, y:cell.y, isAlive:true}
-            } else{
-                newArr[col][row] = {x:cell.x, y:cell.y, isAlive:false}
+            if(count<2){
+//                newArr[col][row] = {x:cell.x, y:cell.y, isAlive:}
             }
         }
     }
@@ -80,4 +102,3 @@ function drawAndUpdate() {
 }
 
 setup();
-countNeighbors(currentArr[3][3]);
