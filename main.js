@@ -22,15 +22,58 @@ function setup() {
             ctx.fillText(`${row}, ${col}, ${cell.isAlive}`, (cell.x+20), (cell.y+25));
         }
     }
+
+    //call set interval on start function
+    start();
+    setTimeout(start, 1000);
+}
+
+function countNeighbors(cell) {
+    //returns count of neighbors
+    let count  = Math.floor(Math.random()*2);
+    return count; 
+}
+
+function update(arr) {
+    //updates whatever array is given to it and returns new array
+    const oldArr = arr;
+    let newArr = [];
+    for(let col=0; col<oldArr.length; col++) {
+        newArr[col] = [];
+        for(let row=0; row<oldArr[col].length; row++) {
+            let cell = (oldArr[col][row]);
+            let count = countNeighbors(cell);
+            //conditions
+            if(count == 1) {
+                newArr[col][row] = {x:cell.x, y:cell.y, isAlive:true}
+            } else{
+                newArr[col][row] = {x:cell.x, y:cell.y, isAlive:false}
+            }
+
+        }
+    }
+
+    return newArr;
 }
 
 function draw(arr) {
     //draws whatever array is given to it
+    ctx.clearRect(0,0,width,height);
+    for(let col = 0; col< arr.length; col++){
+        for(let row = 0; row<arr[col].length; row++) {
+            let cell = arr[col][row];
+            ctx.beginPath();
+            ctx.rect(cell.x, cell.y, res, res);
+            if(cell.isAlive){ctx.fillStyle="green";ctx.fill()}else{ctx.stroke()}
+            ctx.fillStyle = "black";
+            ctx.fillText(`${row}, ${col}, ${cell.isAlive}`, (cell.x+20), (cell.y+25));
+        }       
+    }
 }
 
-
-function update(arr) {
-    //updates whatever array is given to it and returns new array
+function start() {
+    let newArr = update(cellArr);
+    draw(newArr);
 }
 
 setup();
