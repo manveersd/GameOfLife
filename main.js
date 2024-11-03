@@ -13,7 +13,8 @@ let generation = 0;
 function setup() {
     createInitialArray();
     draw(currentArr);
-    drawAndUpdate();
+    textArea.textContent = `Generation: ${generation}`;
+    startButton.addEventListener('click', drawAndUpdate);    
 }
 
 //creates first array when window loads
