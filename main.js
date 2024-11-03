@@ -4,38 +4,39 @@ const startButton = document.getElementById('startButton');
 const width = canvas.width;
 const height = canvas.height;
 const res = 80;
-let cellArr = [];
+canvas.style.border = "1px solid black";
+let currentArr = [];
+let intervalId;
 
 function setup() {
-    canvas.style.border = "1px solid black";
-    
-    //make array, draw
+    createInitialArray();
+    draw(currentArr);
+    //drawAndUpdate();
+}
+
+//creates first array when window loads
+function createInitialArray() {
     for (let col = 0; col < width / res; col++) {
-        cellArr[col] = [];
+        currentArr[col] = [];
         for (let row = 0; row < height / res; row++) {
-            let cell = { x: col * res, y: row * res, isAlive: (Math.floor(Math.random()*2)===1) };
-            cellArr[col][row] = cell;
-            ctx.beginPath();
-            ctx.rect(cell.x, cell.y, res, res);
-            if(cell.isAlive){ctx.fillStyle="green";ctx.fill()}else{ctx.stroke()}
-            ctx.fillStyle = "black";
-            ctx.fillText(`${row}, ${col}, ${cell.isAlive}`, (cell.x+20), (cell.y+25));
+            let cell = { x: col * res, y: row * res, isAlive: (Math.floor(Math.random() * 2) === 1) };
+            currentArr[col][row] = cell;
         }
     }
-
-    //call set interval on start function
-    start();
-    setTimeout(start, 1000);
 }
 
+//returns count of neighbors for each cell
 function countNeighbors(cell) {
-    //returns count of neighbors
-    let count  = Math.floor(Math.random()*2);
-    return count; 
+    let count  = 0;
+    row = cell.x/res;
+    col = cell.y/res;
+    try{
+        if()
+    } catch(e){};
 }
 
+//updates whatever array is given to it and returns new array based on some rules
 function update(arr) {
-    //updates whatever array is given to it and returns new array
     const oldArr = arr;
     let newArr = [];
     for(let col=0; col<oldArr.length; col++) {
@@ -49,15 +50,13 @@ function update(arr) {
             } else{
                 newArr[col][row] = {x:cell.x, y:cell.y, isAlive:false}
             }
-
         }
     }
-
     return newArr;
 }
 
+//draws whatever array is given to it
 function draw(arr) {
-    //draws whatever array is given to it
     ctx.clearRect(0,0,width,height);
     for(let col = 0; col< arr.length; col++){
         for(let row = 0; row<arr[col].length; row++) {
@@ -71,9 +70,14 @@ function draw(arr) {
     }
 }
 
-function start() {
-    let newArr = update(cellArr);
-    draw(newArr);
+//start function
+function drawAndUpdate() {
+    if (intervalId) clearInterval(intervalId);
+    draw(currentArr);
+    let nextArr = update(currentArr);
+    [currentArr, nextArr] = [nextArr, currentArr]; // Swap arrays
+    intervalId = setInterval(drawAndUpdate, 500);
 }
 
 setup();
+countNeighbors(currentArr[3][3]);
