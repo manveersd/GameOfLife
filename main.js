@@ -9,6 +9,8 @@ canvas.style.border = "1px solid black";
 let currentArr = [];
 let intervalId;
 let generation = 0;
+let isDragging = false;
+let dragStarted = false;
 
 function setup() {
     createInitialArray();
@@ -22,10 +24,51 @@ function createInitialArray() {
     for (let col = 0; col < width / res; col++) {
         currentArr[col] = [];
         for (let row = 0; row < height / res; row++) {
-            let cell = { x: col * res, y: row * res, isAlive: Math.floor(Math.random()*2) };
+            let cell = { x: col * res, y: row * res, isAlive: false };
             currentArr[col][row] = cell;
         }
     }
+}
+
+//draw cells using mouse click or drag
+function mouseControls() {
+
+    canvas.addEventListener('mousedown', function (event) {
+        isDragging = true;
+        dragStarted = false;
+    });
+
+    canvas.addEventListener('mousemove', function (event) {
+        if (isDragging) {
+            dragStarted = true;
+            const rect = canvas.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+            let affectedCell = currentArr[Math.floor(clickX / res)][Math.floor(clickY / res)];
+            affectedCell.isAlive = true;
+            draw(currentArr);
+        }
+    });
+
+    canvas.addEventListener('mouseup', function (event) {
+        isDragging = false;
+    });
+
+    canvas.addEventListener('mouseleave', function (event) {
+        isDragging = false;
+    });
+
+    canvas.addEventListener('click', function (event) {
+        if (!dragStarted) {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+            let affectedCell = cellsArray[Math.floor(clickX / res)][Math.floor(clickY / res)];
+            if (affectedCell.isAlive) { affectedCell.isAlive = false }
+            else { affectedCell.isAlive = true};
+            draw(currentArr);
+        }
+    })
 }
 
 //returns count of neighbors for each cell
