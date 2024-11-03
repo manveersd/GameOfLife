@@ -1,17 +1,19 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const startButton = document.getElementById('startButton');
+const textArea = document.getElementById('text');
 const width = canvas.width;
 const height = canvas.height;
-const res = 80;
+const res = 25;
 canvas.style.border = "1px solid black";
 let currentArr = [];
 let intervalId;
+let generation = 0;
 
 function setup() {
     createInitialArray();
     draw(currentArr);
-    //drawAndUpdate();
+    drawAndUpdate();
 }
 
 //creates first array when window loads
@@ -19,7 +21,7 @@ function createInitialArray() {
     for (let col = 0; col < width / res; col++) {
         currentArr[col] = [];
         for (let row = 0; row < height / res; row++) {
-            let cell = { x: col * res, y: row * res, isAlive: (Math.floor(Math.random() * 2) === 1) };
+            let cell = { x: col * res, y: row * res, isAlive: Math.floor(Math.random()*2) };
             currentArr[col][row] = cell;
         }
     }
@@ -54,8 +56,6 @@ function countNeighbors(cell) {
     try {
         if (currentArr[row + 1][col + 1].isAlive) { count++ };
     } catch (error) { }
-
-    console.log(count);
     return count;
 }
 
@@ -69,9 +69,15 @@ function update(arr) {
             let cell = (oldArr[col][row]);
             let count = countNeighbors(cell);
             //conditions
+            let newCell = {x:cell.x, y:cell.y, isAlive:cell.isAlive};
             if(count<2){
-//                newArr[col][row] = {x:cell.x, y:cell.y, isAlive:}
+                newCell.isAlive = false;
+            } else if(count == 2 || count == 3) {
+                newCell.isAlive = true;
+            } else if(count > 3) {
+                newCell.isAlive = false;
             }
+            newArr[col][row] = newCell;
         }
     }
     return newArr;
@@ -84,10 +90,9 @@ function draw(arr) {
         for(let row = 0; row<arr[col].length; row++) {
             let cell = arr[col][row];
             ctx.beginPath();
-            ctx.rect(cell.x, cell.y, res, res);
-            if(cell.isAlive){ctx.fillStyle="green";ctx.fill()}else{ctx.stroke()}
             ctx.fillStyle = "black";
-            ctx.fillText(`${row}, ${col}, ${cell.isAlive}`, (cell.x+20), (cell.y+25));
+            ctx.rect(cell.x, cell.y, res, res);
+            if(cell.isAlive){ctx.fill()}else{ctx.stroke()}
         }       
     }
 }
@@ -96,6 +101,8 @@ function draw(arr) {
 function drawAndUpdate() {
     if (intervalId) clearInterval(intervalId);
     draw(currentArr);
+    textArea.textContent = `Generation: ${generation}`;
+    generation++;
     let nextArr = update(currentArr);
     [currentArr, nextArr] = [nextArr, currentArr]; // Swap arrays
     intervalId = setInterval(drawAndUpdate, 500);
